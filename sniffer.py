@@ -8,10 +8,10 @@ def sniff_ip(time_to_sniff):
     and returns that dictionary
     """
     ip_dict = dict()
-    packets = sniff(timeout=time_to_sniff, filter="ip", store=0)
+    packets = sniff(timeout=time_to_sniff, filter="ip")
 
     for i in xrange(len(packets)):
-        src = packets[i].src
+        src = packets[i]['IP'].src
         if not src in ip_dict.keys():
             ip_dict[src] = 1
 

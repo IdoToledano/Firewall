@@ -6,7 +6,7 @@ IP_DICT = dict()
 
 
 def main():
-    time_to_sniff = int(raw_input("Enter frequency of sniffing (in seconds): "))
+    time_to_sniff = float(raw_input("Enter frequency of sniffing (in seconds): "))
 
     while True:
         recent_requests = sniff_ip(time_to_sniff)
@@ -19,8 +19,8 @@ def main():
 
         for ip_src in IP_DICT:
             data = IP_DICT[ip_src].get_data()
-            for key in data:
-                print "{0}: {1}".format(key, data[key])
+            if data['velocity'] > 10 or abs(data['acceleration']) > 5:
+                print "---IP---\nip: {}\nvelocity: {}\nacceleration: {}".format(data['ip'], data['velocity'], data['acceleration'])
 
 
 if __name__ == '__main__':
