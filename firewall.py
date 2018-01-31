@@ -72,15 +72,18 @@ class Firewall(object):
     def __del__(self):
         self.reset_iptables()
 
-	def get_from_database(self):
-		# initiate from database
-		ip_list = self.database.get_ip()
-		for ip in ip_list:
-			self.block_ip(ip)
+    def get_from_database(self):
+        """
+        Block all ips and ports that are in the database
+        """
+	# initiate from database
+	ip_list = self.database.get_ip()
+	for ip in ip_list:
+		self.block_ip(ip)
 
-		port_list = self.database.get_port()
-		for port in port_list:
-			self.block_port(port)
+	port_list = self.database.get_ports()
+	for port in port_list:
+		self.block_port(port)
 
     def basic_protections(self):
         """
@@ -89,6 +92,7 @@ class Firewall(object):
         Firewall._default_policy(self.chains)
         Firewall._allow_loopback(self.chains)
         Firewall._allow_established(self.chains)
+
 
     def block_ip(self, ip):
         """
@@ -242,10 +246,11 @@ def main():
     f = Firewall()
     try:
         f.basic_protections()
+	f.get_from_database()
         while not done:
             req = raw_input("Input port ")
             if req:
-                ok = f.unblock_port(req)
+                ok = f.block_port(req)
                 if ok[1]:
                     print ok[1]
             if not req:
