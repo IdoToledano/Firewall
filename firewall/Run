@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+sudo add-apt-repository universe
+sudo apt-get update
+sudo apt-get install python-pip
+sudo apt-get install python-tk
+
+pip install .
+
+sudo python run.py

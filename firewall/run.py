@@ -1,0 +1,3 @@
+import firewall
+
+firewall.main()
