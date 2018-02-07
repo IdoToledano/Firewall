@@ -1,10 +1,11 @@
 from ip_tables import IpTables
-from algorithm import get_suspicous_ips
+from algorithm import get_suspicious
 import Tkinter as tk
 import threading
 
 
 TIME_TO_SNIFF = 100
+
 
 def ban_by_ip(f, ip):
     ip = ip.get()
@@ -16,25 +17,20 @@ def ban_by_port(f, port):
     f.block_port(port)
 
 
-def auto_sniff(f, time_to_sniff, time_str):
-    time_int = time_str
-    done = False
-    while not done:
-        ip_to_ban = get_suspicous_ips(time_to_sniff)
-    for ip in ip_to_ban:
-        print "{} is going to be banned!".format(ip)
-        f.block_ip(ip)
-        
-    time_int -= time_to_sniff
-    if (time_int <= 0):
-        done = True
+def auto_sniff(f):
+    while True:
+        ip_to_ban, port_to_ban = get_suspicious()
+        for ip in ip_to_ban:
+            f.block_ip(ip)
+        for port in port_to_ban:
+            f.block_port(port)
 
 
 def main():
     """
     Add Documentation here
     """
-	# start iptables firewall
+    # start iptables firewall
     t = IpTables()
     t.basic_protections()
     t.get_from_database()
@@ -43,12 +39,11 @@ def main():
     algorithm.setDaemon(True)
     algorithm.start()
 
-	# run gui
+    # run gui
     master = tk.Tk()
-
+    master.minsize(width=400, height=300)
     ip_str = tk.StringVar()
     port_str = tk.StringVar()
-    time_str = tk.StringVar()
 
     ip_entry = tk.Entry(master, textvariable=ip_str)
     ip_button = tk.Button(master, text="Ban IP", command=lambda: ban_by_ip(t, ip_str))
@@ -62,7 +57,7 @@ def main():
 
     master.mainloop()
     
-	# restore iptables
+    # restore iptables
     t.__del__()
     
 
