@@ -1,5 +1,10 @@
 from ip_tables import IpTables
+<<<<<<< HEAD
 from algorithm import get_suspicous_ips
+=======
+from algorithm import get_suspicious
+import Tkinter as tk
+>>>>>>> ade75850bc66931dbf235e227299ba6484ffd5b2
 import threading
 import kivy
 kivy.require('1.10.0')
@@ -16,6 +21,7 @@ TIME_TO_SNIFF = 100
 TEXT = 0
 ACTION_ON_PRESS = 1
 
+
 def ban_by_ip(f, ip):
     ip = ip.get()
     f.block_ip(ip)
@@ -26,18 +32,13 @@ def ban_by_port(f, port):
     f.block_port(port)
 
 
-def auto_sniff(f, time_to_sniff, time_str):
-    time_int = time_str
-    done = False
-    while not done:
-        ip_to_ban = get_suspicous_ips(time_to_sniff)
-    for ip in ip_to_ban:
-        print "{} is going to be banned!".format(ip)
-        f.block_ip(ip)
-        
-    time_int -= time_to_sniff
-    if (time_int <= 0):
-        done = True
+def auto_sniff(f):
+    while True:
+        ip_to_ban, port_to_ban = get_suspicious()
+        for ip in ip_to_ban:
+            f.block_ip(ip)
+        for port in port_to_ban:
+            f.block_port(port)
 
 
 class SmallWindow(BoxLayout):

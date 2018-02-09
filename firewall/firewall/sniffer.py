@@ -13,10 +13,11 @@ def sniff_ip(time_to_sniff):
 
     for i in xrange(len(packets)):
         src = packets[i]['IP'].src
-	if TCP in packets[i]:
-	    sport = packets[i]['TCP'].sport
-	else:
-	    sport = packets[i]['UDP'].sport
+
+    if TCP in packets[i]:
+        sport = packets[i]['TCP'].sport
+    else:
+        sport = packets[i]['UDP'].sport
 
         if not src in ip_dict.keys():
             ip_dict[src] = 1
@@ -24,11 +25,10 @@ def sniff_ip(time_to_sniff):
         else:
             ip_dict[src] += 1
 
+    if not sport in port_dict.keys():
+        port_dict[sport] = 1
 
-	if not sport in port_dict.keys():
-	    port_dict[sport] = 1
+    else:
+        port_dict[sport] += 1
 
-	else:
-	    port_dict[sport] += 1
-
-    return  ip_dict, port_dict
+    return ip_dict, port_dict
