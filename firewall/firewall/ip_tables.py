@@ -94,18 +94,21 @@ class IpTables(object):
         """
         Given and Ip, blocks the ip from all traffic (in or out)
         """
-        rule = iptc.Rule()
-        # in case ip is invalid
         try:
-            rule.set_src(ip)
+            rule = iptc.Rule()
+            # in case ip is invalid
+            try:
+                rule.set_src(ip)
+            except Exception as e:
+                return 1, e
+
+            rule.create_target("DROP")
+            self.chains[INPUT].insert_rule(rule)
+
+            # add ip address to database
+            self.database.add_ip(ip)
         except Exception as e:
             return 1, e
-
-        rule.create_target("DROP")
-        self.chains[INPUT].insert_rule(rule)
-
-        # add ip address to database
-        self.database.add_ip(ip)
 
         return 0, ""
 
@@ -113,6 +116,11 @@ class IpTables(object):
         """
         Given a port, blocks the port from all traffic
         """
+	try:
+	    port = int(port)
+	except Exception as e:
+            return 1, e
+
         for proto in ["tcp", "udp"]:
             rule = iptc.Rule()
 
@@ -129,7 +137,7 @@ class IpTables(object):
 
         # add port to database
         self.database.add_port(int(port))
-
+            
         return 0, ""
 
     def block_site(self, site_name):
@@ -154,16 +162,18 @@ class IpTables(object):
         did not exist in the chain and 0
         when there wasn't any exception
         """
-        rule = iptc.Rule()
-        rule.set_src(ip)
-        rule.create_target("DROP")
-
-        # If ip isn't in chain
         try:
-            self.chains[INPUT].delete_rule(rule)
+            rule = iptc.Rule()
+            rule.set_src(ip)
+            rule.create_target("DROP")
+
+            # If ip isn't in chain
+            try:
+                self.chains[INPUT].delete_rule(rule)
+            except Exception as e:
+                return 1, e
         except Exception as e:
             return 1, e
-
         # remove from database
         self.database.remove_ip(ip)
 
@@ -178,11 +188,16 @@ class IpTables(object):
         did not exist in the chain and 0
         when there wasn't any exception
         """
+	try:
+	    port = int(port)
+	except Exception as e:
+            return 1, e
+
         for proto in ["tcp", "udp"]:
             rule = iptc.Rule()
 
             rule.protocol = proto
-            match = iptc.Match(rule, proto)
+            match = rule.create_match(proto)
             # in case the port is invalid
             try:
                 match.sport = str(port)
@@ -190,8 +205,7 @@ class IpTables(object):
                 return 1, e
 
             rule.create_target("DROP")
-
-            # if rule isn't in chain
+        # if rule isn't in chain
             try:
                 self.chains[INPUT].delete_rule(rule)
             except Exception as e:
