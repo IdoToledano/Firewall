@@ -1,10 +1,6 @@
 from ip_tables import IpTables
-<<<<<<< HEAD
-from algorithm import get_suspicous_ips
-=======
 from algorithm import get_suspicious
 import Tkinter as tk
->>>>>>> ade75850bc66931dbf235e227299ba6484ffd5b2
 import threading
 import kivy
 kivy.require('1.10.0')
